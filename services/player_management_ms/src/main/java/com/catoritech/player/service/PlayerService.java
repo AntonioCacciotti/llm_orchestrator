@@ -1,12 +1,14 @@
 package com.catoritech.player.service;
 
 import com.catoritech.player.dto.AdminPlayerResponse;
+import com.catoritech.player.dto.AdminUpdateRequest;
 import com.catoritech.player.dto.AuthResponse;
 import com.catoritech.player.dto.LoginRequest;
 import com.catoritech.player.dto.PlayerProfileResponse;
 import com.catoritech.player.dto.RegisterRequest;
 import com.catoritech.player.dto.UpdateProfileRequest;
 import com.catoritech.player.model.Player;
+import java.time.LocalDateTime;
 import java.util.List;
 import com.catoritech.player.security.JwtService;
 import com.catoritech.player.security.PasswordService;
@@ -65,11 +67,68 @@ public class PlayerService {
 
     public List<AdminPlayerResponse> getAllPlayers() {
         return Player.<Player>listAll().stream()
-                .map(p -> new AdminPlayerResponse(
-                        p.id, p.username, p.email,
-                        p.role.name(),
-                        p.sex != null ? p.sex.name() : null))
+                .map(this::toAdminResponse)
                 .toList();
+    }
+
+    @Transactional
+    public AdminPlayerResponse suspendPlayer(Long id) {
+        Player player = Player.<Player>findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Player not found"));
+        if (player.status == Player.PlayerStatus.SUSPENDED) {
+            throw new BadRequestException("Player is already suspended");
+        }
+        player.status = Player.PlayerStatus.SUSPENDED;
+        return toAdminResponse(player);
+    }
+
+    @Transactional
+    public AdminPlayerResponse activatePlayer(Long id) {
+        Player player = Player.<Player>findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Player not found"));
+        if (player.status == Player.PlayerStatus.ACTIVE) {
+            throw new BadRequestException("Player is already active");
+        }
+        player.status = Player.PlayerStatus.ACTIVE;
+        return toAdminResponse(player);
+    }
+
+    @Transactional
+    public void deletePlayer(Long id) {
+        Player player = Player.<Player>findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Player not found"));
+        if (player.role == Player.Role.ADMIN) {
+            throw new BadRequestException("Cannot delete an admin player");
+        }
+        player.delete();
+    }
+
+    @Transactional
+    public AdminPlayerResponse adminUpdatePlayer(Long id, AdminUpdateRequest request) {
+        Player player = Player.<Player>findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Player not found"));
+        if (request.username != null && !request.username.equals(player.username)) {
+            if (Player.findByUsername(request.username).isPresent()) {
+                throw new BadRequestException("Username already taken");
+            }
+            player.username = request.username;
+        }
+        if (request.email != null && !request.email.equals(player.email)) {
+            if (Player.findByEmail(request.email).isPresent()) {
+                throw new BadRequestException("Email already registered");
+            }
+            player.email = request.email;
+        }
+        if (request.name != null) player.name = request.name;
+        if (request.surname != null) player.surname = request.surname;
+        if (request.sex != null) player.sex = request.sex;
+        if (request.role != null) player.role = request.role;
+        return toAdminResponse(player);
+    }
+
+    @Transactional
+    public void backfillCreatedAt(Long id, LocalDateTime createdAt) {
+        Player.update("createdAt = ?1 where id = ?2", createdAt, id);
     }
 
     public PlayerProfileResponse getPlayerById(Long id) {
@@ -102,6 +161,15 @@ public class PlayerService {
         if (request.sex != null) player.sex = request.sex;
 
         return toProfileResponse(player);
+    }
+
+    private AdminPlayerResponse toAdminResponse(Player player) {
+        return new AdminPlayerResponse(
+                player.id, player.username, player.email,
+                player.role.name(),
+                player.sex != null ? player.sex.name() : null,
+                player.status.name(),
+                player.createdAt);
     }
 
     private PlayerProfileResponse toProfileResponse(Player player) {

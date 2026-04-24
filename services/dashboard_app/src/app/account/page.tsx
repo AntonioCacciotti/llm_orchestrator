@@ -1,14 +1,11 @@
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
-import { clearToken, getToken } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 import { getProfile, updateProfile, PlayerProfileResponse } from "@/lib/api";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AccountPage() {
-  const router = useRouter();
-
   const [profile, setProfile] = useState<PlayerProfileResponse | null>(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -74,15 +71,10 @@ export default function AccountPage() {
     }
   }
 
-  function handleLogout() {
-    clearToken();
-    router.push("/login");
-  }
-
   return (
     <AuthGuard>
-      <div className="page-center">
-        <div className="card" style={{ maxWidth: 480 }}>
+      <div className="account-page">
+        <div className="card" style={{ maxWidth: 480, width: "100%" }}>
           <h1>My Account</h1>
 
           {loading && <p style={{ textAlign: "center" }}>Loading…</p>}
@@ -209,14 +201,6 @@ export default function AccountPage() {
                   {saving ? "Saving…" : "Save changes"}
                 </button>
               </form>
-
-              <button
-                className="btn"
-                style={{ marginTop: "0.75rem", background: "#e5e7eb", color: "#111" }}
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
             </>
           )}
         </div>

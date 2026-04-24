@@ -1,7 +1,10 @@
 package com.catoritech.reports.resource;
 
+import com.catoritech.reports.dto.RegistrationTrendPointDto;
 import com.catoritech.reports.dto.UsersReportResponse;
 import com.catoritech.reports.service.ReportsService;
+
+import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
@@ -36,5 +39,12 @@ public class ReportsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public UsersReportResponse getAdminUsers(@HeaderParam("Authorization") String authorization) {
         return reportsService.getUsersReport(authorization);
+    }
+
+    @GET
+    @Path("/admin/registrations/trend")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RegistrationTrendPointDto> getRegistrationTrend(@HeaderParam("Authorization") String authorization) {
+        return reportsService.getRegistrationTrend(authorization);
     }
 }

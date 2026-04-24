@@ -1,5 +1,6 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8081";
 const REPORTS_MS_URL = process.env.NEXT_PUBLIC_REPORTS_URL ?? "http://localhost:8082";
+const PLAYER_MANAGEMENT_MS_URL = process.env.NEXT_PUBLIC_PLAYER_MANAGEMENT_MS_URL ?? "http://localhost:8081";
 
 export interface LoginCredentials {
   username: string;
@@ -110,8 +111,27 @@ export async function updateProfile(token: string, data: UpdateProfileData): Pro
 export interface AdminUser {
   id: string;
   username: string;
+  email: string | null;
+  name: string | null;
+  surname: string | null;
   role: string;
   sex: string;
+  status: string;
+  createdAt: string | null;
+}
+
+export interface AdminUpdateBody {
+  username: string;
+  email: string;
+  name: string;
+  surname: string;
+  sex: string;
+  role: string;
+}
+
+export interface RegistrationTrendPoint {
+  date: string;
+  count: number;
 }
 
 export interface AdminUsersResponse {
@@ -127,6 +147,66 @@ export interface AdminUsersResponse {
 export async function getAdminUsers(token: string): Promise<AdminUsersResponse> {
   const res = await fetch(`${REPORTS_MS_URL}/api/reports/admin/users`, {
     headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err: ApiError = await res.json();
+    throw new Error(err.message);
+  }
+  return res.json();
+}
+
+export async function getRegistrationTrend(token: string): Promise<RegistrationTrendPoint[]> {
+  const res = await fetch(`${REPORTS_MS_URL}/api/reports/admin/registrations/trend`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err: ApiError = await res.json();
+    throw new Error(err.message);
+  }
+  return res.json();
+}
+
+export async function suspendPlayer(id: string, token: string): Promise<void> {
+  const res = await fetch(`${PLAYER_MANAGEMENT_MS_URL}/api/v1/admin/players/${id}/suspend`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err: ApiError = await res.json();
+    throw new Error(err.message);
+  }
+}
+
+export async function activatePlayer(id: string, token: string): Promise<void> {
+  const res = await fetch(`${PLAYER_MANAGEMENT_MS_URL}/api/v1/admin/players/${id}/activate`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err: ApiError = await res.json();
+    throw new Error(err.message);
+  }
+}
+
+export async function deletePlayer(id: string, token: string): Promise<void> {
+  const res = await fetch(`${PLAYER_MANAGEMENT_MS_URL}/api/v1/admin/players/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err: ApiError = await res.json();
+    throw new Error(err.message);
+  }
+}
+
+export async function updatePlayer(id: string, body: AdminUpdateBody, token: string): Promise<AdminUser> {
+  const res = await fetch(`${PLAYER_MANAGEMENT_MS_URL}/api/v1/admin/players/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const err: ApiError = await res.json();

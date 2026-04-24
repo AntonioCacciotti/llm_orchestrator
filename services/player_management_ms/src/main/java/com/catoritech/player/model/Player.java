@@ -42,6 +42,10 @@ public class Player extends PanacheEntity {
     @Column(nullable = false)
     public Role role = Role.PLAYER;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public PlayerStatus status = PlayerStatus.ACTIVE;
+
     @Column(nullable = false, updatable = false)
     public LocalDateTime createdAt = LocalDateTime.now();
 
@@ -66,5 +70,9 @@ public class Player extends PanacheEntity {
 
     public enum Role {
         PLAYER, ADMIN
+    }
+
+    public enum PlayerStatus {
+        ACTIVE, SUSPENDED
     }
 }

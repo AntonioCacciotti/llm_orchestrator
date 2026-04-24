@@ -1,6 +1,7 @@
 package com.catoritech.reports.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayerDto {
@@ -9,4 +10,6 @@ public class PlayerDto {
     public String email;
     public String role;
     public String sex;
+    public LocalDateTime createdAt;
+    public String status;
 }
