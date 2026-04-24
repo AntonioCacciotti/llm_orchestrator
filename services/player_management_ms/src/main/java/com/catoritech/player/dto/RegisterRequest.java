@@ -26,4 +26,5 @@ public class RegisterRequest {
     public LocalDate birthday;
     public String mobilePhone;
     public Player.Sex sex;
+    public boolean isAdmin = false;
 }

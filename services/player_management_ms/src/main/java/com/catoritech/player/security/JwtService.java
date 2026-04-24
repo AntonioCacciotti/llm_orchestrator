@@ -20,7 +20,7 @@ public class JwtService {
     public String generateToken(Player player) {
         return Jwt.issuer(issuer)
                 .subject(player.id.toString())
-                .groups(Set.of("player"))
+                .groups(player.role == Player.Role.ADMIN ? Set.of("admin", "player") : Set.of("player"))
                 .claim("username", player.username)
                 .claim("email", player.email)
                 .expiresIn(Duration.ofSeconds(tokenLifespanSeconds))

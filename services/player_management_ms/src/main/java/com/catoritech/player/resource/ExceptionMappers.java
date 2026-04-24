@@ -4,6 +4,7 @@ import com.catoritech.player.dto.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -28,6 +29,16 @@ public class ExceptionMappers {
         public Response toResponse(NotAuthorizedException e) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity(new ErrorResponse(401, "Unauthorized", e.getMessage()))
+                    .build();
+        }
+    }
+
+    @Provider
+    public static class NotFoundMapper implements ExceptionMapper<NotFoundException> {
+        @Override
+        public Response toResponse(NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ErrorResponse(404, "Not Found", e.getMessage()))
                     .build();
         }
     }

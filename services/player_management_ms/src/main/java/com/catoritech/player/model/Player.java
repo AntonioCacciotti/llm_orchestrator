@@ -38,6 +38,10 @@ public class Player extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     public Sex sex;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public Role role = Role.PLAYER;
+
     @Column(nullable = false, updatable = false)
     public LocalDateTime createdAt = LocalDateTime.now();
 
@@ -58,5 +62,9 @@ public class Player extends PanacheEntity {
 
     public enum Sex {
         MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY
+    }
+
+    public enum Role {
+        PLAYER, ADMIN
     }
 }
