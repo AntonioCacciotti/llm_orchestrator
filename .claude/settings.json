@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
+      "Bash(git *)",
+      "Bash(mvn *)",
+      "Bash(npm *)",
+      "Bash(cd *)",
+      "Bash(cat *)",
+      "Bash(echo *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(wait)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-env-read.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/enforce-service-boundary.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/enforce-allowed-dir-on-spawn.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
