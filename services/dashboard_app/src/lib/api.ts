@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8081";
+const REPORTS_MS_URL = process.env.NEXT_PUBLIC_REPORTS_URL ?? "http://localhost:8082";
 
 export interface LoginCredentials {
   username: string;
@@ -98,6 +99,34 @@ export async function updateProfile(token: string, data: UpdateProfileData): Pro
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err: ApiError = await res.json();
+    throw new Error(err.message);
+  }
+  return res.json();
+}
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  role: string;
+  sex: string;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  genderBreakdown: {
+    male: number;
+    female: number;
+    other: number;
+    preferNotToSay: number;
+  };
+}
+
+export async function getAdminUsers(token: string): Promise<AdminUsersResponse> {
+  const res = await fetch(`${REPORTS_MS_URL}/api/reports/admin/users`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
     const err: ApiError = await res.json();

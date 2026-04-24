@@ -1,11 +1,13 @@
 package com.catoritech.player.service;
 
+import com.catoritech.player.dto.AdminPlayerResponse;
 import com.catoritech.player.dto.AuthResponse;
 import com.catoritech.player.dto.LoginRequest;
 import com.catoritech.player.dto.PlayerProfileResponse;
 import com.catoritech.player.dto.RegisterRequest;
 import com.catoritech.player.dto.UpdateProfileRequest;
 import com.catoritech.player.model.Player;
+import java.util.List;
 import com.catoritech.player.security.JwtService;
 import com.catoritech.player.security.PasswordService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -59,6 +61,15 @@ public class PlayerService {
 
         String token = jwtService.generateToken(player);
         return buildAuthResponse(token, player);
+    }
+
+    public List<AdminPlayerResponse> getAllPlayers() {
+        return Player.<Player>listAll().stream()
+                .map(p -> new AdminPlayerResponse(
+                        p.id, p.username, p.email,
+                        p.role.name(),
+                        p.sex != null ? p.sex.name() : null))
+                .toList();
     }
 
     public PlayerProfileResponse getPlayerById(Long id) {
