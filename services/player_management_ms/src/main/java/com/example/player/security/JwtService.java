@@ -1,0 +1,33 @@
+package com.example.player.security;
+
+import com.example.player.model.Player;
+import io.smallrye.jwt.build.Jwt;
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.time.Duration;
+import java.util.Set;
+
+@ApplicationScoped
+public class JwtService {
+
+    @ConfigProperty(name = "smallrye.jwt.new-token.lifespan", defaultValue = "3600")
+    long tokenLifespanSeconds;
+
+    @ConfigProperty(name = "smallrye.jwt.new-token.issuer")
+    String issuer;
+
+    public String generateToken(Player player) {
+        return Jwt.issuer(issuer)
+                .subject(player.id.toString())
+                .groups(player.role == Player.Role.ADMIN ? Set.of("admin", "player") : Set.of("player"))
+                .claim("username", player.username)
+                .claim("email", player.email)
+                .expiresIn(Duration.ofSeconds(tokenLifespanSeconds))
+                .sign();
+    }
+
+    public long getTokenLifespanSeconds() {
+        return tokenLifespanSeconds;
+    }
+}

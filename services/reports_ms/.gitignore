@@ -1,0 +1,21 @@
+target/
+.quarkus/
+*.class
+*.jar
+!*-runner.jar
+!*-runner
+*.war
+
+# IDE
+.idea/
+*.iml
+.eclipse/
+.settings/
+.project
+.classpath
+
+# Logs
+*.log
+
+# Private key - never commit
+src/main/resources/META-INF/resources/privateKey.pem

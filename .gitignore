@@ -1,0 +1,4 @@
+local/
+.env
+prompts/tasks/
+prompts/results/
